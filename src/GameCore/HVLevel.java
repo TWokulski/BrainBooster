@@ -7,19 +7,16 @@ public class HVLevel
     public static int levelNumber = 1;
     public int howManyObjects;
     public int valueLimit;
+    public static boolean endOfTheGame;
 
     Random random = new Random();
-
-    HVLevel()
-    {
-
-    }
 
    public void whichLevel()
    {
        switch (levelNumber)
        {
            case 1:
+               endOfTheGame = false;
                howManyObjects = 6;
                valueLimit = 14;
                break;
@@ -58,29 +55,28 @@ public class HVLevel
            case 10:
                howManyObjects = 10;
                valueLimit = 50;
-
                break;
 
        }
    }
 
 
-    public int GetRandomSize()
+    public int getRandomSize()
     {
         return random.nextInt(210) +50;
     }
 
-    public int GetRandomX(int objectSize)
+    public int getRandomX(int objectSize)
     {
         return random.nextInt(1000 - objectSize);
     }
 
-    public int GetRandomY(int objectSize)
+    public int getRandomY(int objectSize)
     {
         return random.nextInt(672 -objectSize);
     }
 
-    public int GetRandomValue()
+    public int getRandomValue()
     {
         return random.nextInt(valueLimit)+1;
     }

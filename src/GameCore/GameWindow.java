@@ -2,8 +2,6 @@ package GameCore;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
@@ -14,6 +12,8 @@ public class GameWindow extends JFrame
    // JButton p = new JButton("zmien");
     public static int wrongAnswerCounter = 0;
     HVLevel level = new HVLevel();
+    Runnable timeMeasure = new TimeMeasuring();
+    Thread time;
 
     GameWindow()
     {
@@ -25,45 +25,60 @@ public class GameWindow extends JFrame
         this.setSize(1024, 768);
         this.setTitle("BrainBooster");
 
-        int frameWidth = this.getSize().width;
-        int frameHeight = this.getSize().height;
-
-        this.setLocation((screenWidth - frameWidth)/2, (screenHeight - frameHeight)/2);
-        this.getContentPane().add(upperPanel, BorderLayout.NORTH);
-        this.getContentPane().add(lowerPanel);
         this.setDefaultCloseOperation(EXIT_ON_CLOSE);
         this.setResizable(false);
+
+        int frameWidth = this.getSize().width;
+        int frameHeight = this.getSize().height;
+        this.setLocation((screenWidth - frameWidth)/2, (screenHeight - frameHeight)/2);
+
+        this.getContentPane().add(upperPanel, BorderLayout.NORTH);
+        this.getContentPane().add(lowerPanel);
 
     }
 
     public void loadGame()
     {
-        lowerPanel.valueList.clear();
-        lowerPanel.circleList.clear();
-
-        level.whichLevel();
-        upperPanel.lvlText="Poziom: "+HVLevel.levelNumber;
-        upperPanel.missText ="Liczba błędów: "+wrongAnswerCounter;
-        upperPanel.repaint();
-
-        while(lowerPanel.circleList.size() != level.howManyObjects )
+        if(HVLevel.endOfTheGame==true)
         {
-            lowerPanel.AddValue();
+            finishTheGame();
         }
-        HVLevel.levelNumber ++;
         if(HVLevel.levelNumber>10)
         {
             HVLevel.levelNumber =1;
             wrongAnswerCounter = 0;
-        }
 
+        }
+        lowerPanel.valueList.clear();
+        lowerPanel.circleList.clear();
+
+        if(!HVLevel.endOfTheGame)
+        {
+            level.whichLevel();
+            upperPanel.lvlText="Poziom: "+HVLevel.levelNumber;
+            upperPanel.missText ="Liczba błędów: "+wrongAnswerCounter;
+            upperPanel.repaint();
+
+            while(lowerPanel.circleList.size() != level.howManyObjects )
+            {
+                lowerPanel.AddValue();
+            }
+            HVLevel.levelNumber ++;
+        }
+    }
+    public void finishTheGame()
+    {
+        System.out.println(upperPanel.timeText);
+        time.interrupt();
+        lowerPanel.repaint();
+        upperPanel.click = false;
     }
 
     public void initializeHVComponents()
     {
-        upperPanel.setBackground(Color.BLUE);
-        upperPanel.setPreferredSize(new Dimension(1024,72));
-        lowerPanel.setBackground(Color.yellow);
+        //upperPanel.setBackground(Color.BLUE);
+        //upperPanel.setPreferredSize(new Dimension(1024,72));
+        //lowerPanel.setBackground(Color.yellow);
 
         lowerPanel.addMouseListener(new MouseAdapter()
         {
@@ -74,6 +89,11 @@ public class GameWindow extends JFrame
                 {
                     if(lowerPanel.checkValue()==true)
                     {
+                        if(HVLevel.levelNumber > 10)
+                        {
+                            HVLevel.endOfTheGame = true;
+                        }
+
                         loadGame();
                     }
                     else
@@ -95,10 +115,13 @@ public class GameWindow extends JFrame
                 super.mouseClicked(e);
                 if(e.getX() > 768 && !upperPanel.click)
                 {
+                    time = new Thread(timeMeasure);
+                    HVLevel.endOfTheGame = false;
                     loadGame();
+                    time.start();
                     upperPanel.click = true;
-                }
 
+                }
 
             }
         });
@@ -110,6 +133,51 @@ public class GameWindow extends JFrame
             }
         });*/
     }
+    class TimeMeasuring implements Runnable {
+        int milliseconds, seconds, minutes;
+        String secondsText, minutesText;
+        public void run()
+        {
+            minutes = 0; seconds = 0; milliseconds = 0;
+            while (minutes < 61 || !Thread.currentThread().isInterrupted()){
+                try {
+                    upperPanel.repaint();
+                    Thread.sleep(10);
+                    milliseconds += 10;
+                    if (milliseconds == 1000) {
+                        milliseconds = 0;
+                        seconds++;
+                    }
+                    if (seconds == 60) {
+                        milliseconds = 0;
+                        seconds = 0;
+                        minutes++;
+                    }
+                    if (minutes == 60) {
+                        System.out.println("You probably forgot about the game!");
+                    }
+
+                    if(seconds < 10)
+                        secondsText = "0" + seconds;
+                    else
+                        secondsText = seconds + "";
+
+                    if(minutes < 10)
+                        minutesText = "0" + minutes;
+                    else
+                        minutesText = minutes + "";
+
+                    upperPanel.timeText = minutesText + ":" + secondsText + ":" + milliseconds;
+
+                }
+                catch (InterruptedException e) {
+                    break;
+                }
+            }
+
+        }
+    }
+
 
 }
 

@@ -2,18 +2,18 @@ package GameCore;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+
 
 public class Header extends JPanel
 {
     private static Image bg = new ImageIcon("bg.gif").getImage();
     String missText = "Liczba błędów: ";
     String lvlText = "Poziom: ";
+    String timeText = "00:00:00 ";
     public boolean click;
     Header()
     {
-
+        setPreferredSize(new Dimension(1024,72));
     }
 
     @Override
@@ -24,7 +24,7 @@ public class Header extends JPanel
         g.setFont(new Font("Arial",Font.PLAIN, 30));
 
 
-        g.drawString("00:00:00",11,45);
+        g.drawString(timeText,11,45);
         g.drawString(lvlText,211,45);
         g.drawString(missText,411,45);
         g.setFont(new Font("Arial",Font.BOLD, 40));

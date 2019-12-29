@@ -4,7 +4,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
-import java.util.Random;
 
 public class PlayWindow extends JPanel
 {
@@ -23,13 +22,13 @@ public class PlayWindow extends JPanel
 
     public void AddValue()
     {
-        int scale = level.GetRandomSize();
-        int startX = level.GetRandomX(scale);
-        int startY = level.GetRandomY(scale);
+        int scale = level.getRandomSize();
+        int startX = level.getRandomX(scale);
+        int startY = level.getRandomY(scale);
         int middleX = (int)(startX + 0.5*scale);
         int middleY = (int)(startY + 0.5*scale);
         level.whichLevel();
-        int randomValue = level.GetRandomValue();
+        int randomValue = level.getRandomValue();
 
         Point middlePoint = new Point(middleX,middleY);
 
@@ -60,6 +59,7 @@ public class PlayWindow extends JPanel
                 }
             }
 
+
         this.repaint();
     }
 
@@ -89,6 +89,12 @@ public class PlayWindow extends JPanel
                     ((Number)valueList.get(j)).x,
                     ((Number)valueList.get(j)).y);
         }
+        if(HVLevel.endOfTheGame == true)
+        {
+            g.setFont(new Font("Arial",Font.BOLD, 50));
+            g.drawString("Gratki koniec gry",100,100);
+        }
+
     }
 
 
