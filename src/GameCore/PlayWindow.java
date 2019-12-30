@@ -12,7 +12,7 @@ public class PlayWindow extends JPanel
     private int whichObjectWasClicked;
     private static Image bg2 = new ImageIcon("gb2.gif").getImage();
 
-   HVLevel level = new HVLevel();
+    HVLevel level = new HVLevel();
 
     PlayWindow()
     {
@@ -58,13 +58,8 @@ public class PlayWindow extends JPanel
                     valueList.add(new Number(startX, startY, scale, randomValue));
                 }
             }
-
-
         this.repaint();
     }
-
-
-
 
 
 

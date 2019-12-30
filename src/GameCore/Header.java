@@ -14,6 +14,7 @@ public class Header extends JPanel
     Header()
     {
         setPreferredSize(new Dimension(1024,72));
+
     }
 
     @Override
@@ -24,12 +25,15 @@ public class Header extends JPanel
         g.setFont(new Font("Arial",Font.PLAIN, 30));
 
 
-        g.drawString(timeText,11,45);
-        g.drawString(lvlText,211,45);
-        g.drawString(missText,411,45);
+        g.drawString(timeText,10,45);
+        g.drawString(lvlText,210,45);
+        g.drawString(missText,410,45);
         g.setFont(new Font("Arial",Font.BOLD, 40));
+        g.drawLine(690,10,690,60);
+        g.drawLine(865,10,865,60);
+        //g.drawRect(718,9,170,52);
+        g.drawString("START",710,50);
+        g.drawString("BACK",885,50);
 
-        g.drawRect(768,9,245,52);
-        g.drawString("START",798,50);
     }
 }
