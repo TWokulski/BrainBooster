@@ -52,15 +52,15 @@ public class PlayWindow extends JPanel
                         break;
                     }
                 }
-                if(overlapping!=true)
+                if(!overlapping)
                 {
                     circleList.add(new CircleValue(startX, startY, scale));
                     valueList.add(new Number(startX, startY, scale, randomValue));
                 }
+
             }
         this.repaint();
     }
-
 
 
     @Override

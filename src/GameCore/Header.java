@@ -10,6 +10,11 @@ public class Header extends JPanel
     String missText = "Liczba błędów: ";
     String lvlText = "Poziom: ";
     String timeText = "00:00:00 ";
+    String startText = "START";
+    private Color textColor;
+    private int startX;
+    private int startY;
+
     public boolean click;
     Header()
     {
@@ -23,17 +28,30 @@ public class Header extends JPanel
         super.paintComponent(g);
         g.drawImage(bg,0,0,1024,72,null);
         g.setFont(new Font("Arial",Font.PLAIN, 30));
-
-
+        textColor = Color.BLACK;
+        g.setColor(textColor);
         g.drawString(timeText,10,45);
         g.drawString(lvlText,210,45);
         g.drawString(missText,410,45);
         g.setFont(new Font("Arial",Font.BOLD, 40));
         g.drawLine(690,10,690,60);
         g.drawLine(865,10,865,60);
-        //g.drawRect(718,9,170,52);
-        g.drawString("START",710,50);
         g.drawString("BACK",885,50);
+        if(!startText.equals("START")) {
+            textColor = Color.DARK_GRAY;
+            g.setFont(new Font("Arial",Font.BOLD, 32));
+            startX = 705;
+            startY = 45;
+        }
+        else {
+            startX = 710;
+            startY = 50;
+            textColor = Color.BLACK;
+        }
+        g.setColor(textColor);
+        g.drawString(startText,startX,startY);
+
+
 
     }
 }

@@ -2,8 +2,7 @@ package GameCore;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+
 
 public class GameMenu extends JPanel
 {
@@ -16,8 +15,6 @@ public class GameMenu extends JPanel
     GameMenu()
     {
         setPreferredSize(new Dimension(1024, 768));
-
-
     }
 
     @Override

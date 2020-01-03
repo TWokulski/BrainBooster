@@ -1,9 +1,17 @@
 package GameCore;
 
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.PrintWriter;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 public class GameWindow extends JFrame
 {
@@ -11,6 +19,7 @@ public class GameWindow extends JFrame
     JPanel innerGameScreen = new JPanel();          //Panel innerGameScreen służy jako panel zbiorczy dla nagłówka i okienka gry
     Header upperPanel = new Header();               //Panel nagłówka, mieści informacje o grze, oraz kontrolki podreczne
     PlayWindow lowerPanel = new PlayWindow();       //Panel gry, to na nim pojawiaja sie wartości przeznaczone do wybrania w HV
+    ScoreBoard scorePanel = new ScoreBoard();
     GameMenu menuPanel = new GameMenu();            //Panel menu głównego
     CardLayout cLayout = new CardLayout();          //Card Layout pozwala na szybkie przemieszczanie się pomiędzy panelami Menu i gry
     public static int wrongAnswerCounter = 0;       //Zmienna zliczająca błędne odpowiedzi
@@ -43,6 +52,7 @@ public class GameWindow extends JFrame
 
         gameScreen.add(menuPanel,"1");              //Menu Panel przyjmuje podpis "1" w Card Layout
         gameScreen.add(innerGameScreen,"2");        //Panel nagłówka i gry przyjmuje podpis "2" w Card Layout
+        gameScreen.add(scorePanel,"3");
 
         innerGameScreen.add(upperPanel, BorderLayout.NORTH);  //Dodanie Panelu nagłowka, ustawienie go powyżej panelu gry
         innerGameScreen.add(lowerPanel);                      //Dodanie Panelu gry
@@ -52,9 +62,9 @@ public class GameWindow extends JFrame
         menuPanel.addMouseListener(new MouseAdapter()
         {
             @Override
-            public void mouseClicked(MouseEvent e)
+            public void mousePressed(MouseEvent e)
             {
-                super.mouseClicked(e);
+                super.mousePressed(e);
                 if(e.getX() > (menuPanel.distanceToRectX)/2 && e.getX() < (menuPanel.distanceToRectX)/2 + menuPanel.rectWidth)
                 {
                     if(e.getY() > 2*menuPanel.rectHeight && e.getY() < 3*menuPanel.rectHeight)
@@ -69,7 +79,7 @@ public class GameWindow extends JFrame
 
                     if(e.getY() > (int)(3.5*menuPanel.rectHeight) && e.getY() < (int)(4.5*menuPanel.rectHeight))
                     {
-
+                        cLayout.show(gameScreen,"3");
                     }
                     if(e.getY() > 5*menuPanel.rectHeight && e.getY() < 6*menuPanel.rectHeight)
                     {
@@ -78,20 +88,29 @@ public class GameWindow extends JFrame
                 }
             }
         });
+        scorePanel.addMouseListener(new MouseAdapter()
+        {
+            @Override
+            public void mousePressed(MouseEvent e)
+            {
+                super.mousePressed(e);
+                if(e.getY() > 658)
+                {
+                    cLayout.show(gameScreen,"1");
+                }
+            }
+        });
     }
 
     public void loadGame()
     {
-        if(HVLevel.endOfTheGame==true)
+        if(HVLevel.endOfTheGame)
         {
             finishTheGame();
-        }
-        if(HVLevel.levelNumber>10)
-        {
             HVLevel.levelNumber =1;
             wrongAnswerCounter = 0;
-
         }
+
         lowerPanel.valueList.clear();
         lowerPanel.circleList.clear();
 
@@ -113,7 +132,18 @@ public class GameWindow extends JFrame
     {
         timeMeasure.interrupt();        //Przerwanie liczenia czasu
         userName = JOptionPane.showInputDialog("Podaj mi proszę swoje imię...");
-        System.out.println(userName + ", twoj czas to: " + upperPanel.timeText);
+        try
+        {
+            PrintWriter scoreSave = new PrintWriter(new FileWriter("score.txt", true));
+            LocalDateTime currentDate = LocalDateTime.now();
+            DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
+            String formattedDate = currentDate.format(dateFormat);
+            scoreSave.println(formattedDate + "/" + userName + "/" + upperPanel.timeText
+                    + "/" + wrongAnswerCounter);
+            scoreSave.close();
+        }
+        catch (Exception e) { System.err.println(e.getMessage()); }
+        //System.out.println(userName + ", twoj czas to: " + upperPanel.timeText);
         lowerPanel.repaint();           //Odswieżenie Panelu gry
         upperPanel.click = false;
     }
@@ -132,14 +162,21 @@ public class GameWindow extends JFrame
                         if(HVLevel.levelNumber > 10)
                         {
                             HVLevel.endOfTheGame = true;
+                            upperPanel.startText = "RESTART";
+                            upperPanel.repaint();
                         }
-
+                        playSound(new File("goodSound.wav"));
                         loadGame();
                     }
                     else
                     {
                         wrongAnswerCounter++;
-                        upperPanel.missText ="Liczba błędów: "+wrongAnswerCounter;
+                        playSound(new File("badSound.wav"));
+                        if(wrongAnswerCounter > 100)
+                            upperPanel.missText ="Liczba błędów: 100+";
+                        else
+                            upperPanel.missText ="Liczba błędów: "+wrongAnswerCounter;
+
                         upperPanel.repaint();
                         System.out.println("no nie");
                     }
@@ -150,47 +187,90 @@ public class GameWindow extends JFrame
         upperPanel.addMouseListener(new MouseAdapter()
         {
             @Override
-            public void mouseClicked(MouseEvent e)
+            public void mousePressed(MouseEvent e)
             {
-                super.mouseClicked(e);
+                super.mousePressed(e);
                 if(e.getX() > 690 && e.getX() < 865 && !upperPanel.click)
                 {
+                    upperPanel.startText = "START";
+                    upperPanel.repaint();
                     timeMeasure = new Thread(new TimeMeasuring());
                     HVLevel.endOfTheGame = false;
                     loadGame();
                     timeMeasure.start();
+
                     upperPanel.click = true;
                 }
                 if(e.getX() > 865)
                 {
                     cLayout.show(gameScreen,"1");
+                    HVLevel.levelNumber =1;
+                    wrongAnswerCounter = 0;
+                    upperPanel.click = false;
+                    if(timeMeasure != null)
+                    {
+                        timeMeasure.interrupt();
+                    }
+
+                    lowerPanel.valueList.clear();
+                    lowerPanel.circleList.clear();
+                    upperPanel.lvlText = "Poziom: ";
+                    upperPanel.timeText = "00:00:00 ";
+                    upperPanel.missText = "Liczba błędów: ";
+                    upperPanel.startText = "START";
+                    upperPanel.repaint();
+                    lowerPanel.repaint();
+
+
                 }
 
             }
         });
-
     }
+
+    public static synchronized void playSound(final File soundFile) {
+        new Thread(new Runnable() {
+            public void run() {
+                try {
+                    Clip sound = AudioSystem.getClip();
+                    AudioInputStream inputStream = AudioSystem.getAudioInputStream(soundFile);
+                    sound.open(inputStream);
+                    sound.start();
+                } catch (Exception e) {
+                    System.err.println(e.getMessage());
+                }
+            }
+        }).start();
+    }
+
+
+
     class TimeMeasuring implements Runnable {
         int oneTenthMilliseconds, seconds, minutes;
         String millisecondsText, secondsText, minutesText;
         public void run()
         {
             minutes = 0; seconds = 0; oneTenthMilliseconds = 0;
-            while (minutes < 61 || !Thread.currentThread().isInterrupted()){
-                try {
+            while (minutes < 61 || !Thread.currentThread().isInterrupted())
+            {
+                try
+                {
                     upperPanel.repaint();
                     Thread.sleep(10);
                     oneTenthMilliseconds += 1;
-                    if (oneTenthMilliseconds == 100) {
+                    if (oneTenthMilliseconds == 100)
+                    {
                         oneTenthMilliseconds = 0;
                         seconds++;
                     }
-                    if (seconds == 60) {
+                    if (seconds == 60)
+                    {
                         oneTenthMilliseconds = 0;
                         seconds = 0;
                         minutes++;
                     }
-                    if (minutes == 60) {
+                    if (minutes == 60)
+                    {
                         System.out.println("You probably forgot about the game!");
                     }
 
@@ -209,16 +289,11 @@ public class GameWindow extends JFrame
                         minutesText = minutes + "";
 
                     upperPanel.timeText = minutesText + ":" + secondsText + ":" + oneTenthMilliseconds;
-
                 }
-                catch (InterruptedException e) {
-                    break;
-                }
+                catch (InterruptedException e) { break;}
             }
-
         }
     }
-
 
 }
 

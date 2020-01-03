@@ -10,6 +10,7 @@ public class CircleValue
     public int size;
     public int x;
     public int y;
+
     CircleValue(int w, int h, int s)
     {
         x = w;
