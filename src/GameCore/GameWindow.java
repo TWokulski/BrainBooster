@@ -10,21 +10,21 @@ import java.time.format.DateTimeFormatter;
 
 public class GameWindow extends JFrame
 {
-    JPanel gameScreen = new JPanel();               //Panel gameScreen to panel główny, wykorzystywany do CardLayout
-    JPanel innerGameScreen = new JPanel();          //Panel innerGameScreen służy jako panel zbiorczy dla nagłówka i okienka gry
-    Header upperPanel = new Header();               //Panel nagłówka, mieści informacje o grze, oraz kontrolki podreczne
-    PlayWindow lowerPanel = new PlayWindow();       //Panel gry, to na nim pojawiaja sie wartości przeznaczone do wybrania w HV
-    ScoreBoard scorePanel = new ScoreBoard();
-    GameMenu menuPanel = new GameMenu();            //Panel menu głównego
-    CardLayout cLayout = new CardLayout();          //Card Layout pozwala na szybkie przemieszczanie się pomiędzy panelami Menu i gry
-    public static int wrongAnswerCounter = 0;       //Zmienna zliczająca błędne odpowiedzi
-    HVLevel level = new HVLevel();                  //Reprezentacja poziomów, obiekt pozwala na uzyskiwanie różnicy w parametrach
-    Thread timeMeasure;                             //Wątek odpowiedzialny za zliczanie czasu
-    String userName;
+    private JPanel gameScreen = new JPanel();               //Panel gameScreen to panel główny, wykorzystywany do CardLayout
+    private JPanel innerGameScreen = new JPanel();          //Panel innerGameScreen służy jako panel zbiorczy dla nagłówka i okienka gry
+    private Header upperPanel = new Header();               //Panel nagłówka, mieści informacje o grze, oraz kontrolki podreczne
+    private PlayWindow lowerPanel = new PlayWindow();       //Panel gry, to na nim pojawiaja sie wartości przeznaczone do wybrania w HV
+    private ScoreBoard scorePanel = new ScoreBoard();
+    private GameMenu menuPanel = new GameMenu();            //Panel menu głównego
+    private CardLayout cLayout = new CardLayout();          //Card Layout pozwala na szybkie przemieszczanie się pomiędzy panelami Menu i gry
+    private HVLevel level = new HVLevel();                  //Reprezentacja poziomów, obiekt pozwala na uzyskiwanie różnicy w parametrach
+    private static int wrongAnswerCounter = 0;       //Zmienna zliczająca błędne odpowiedzi
+    private Thread timeMeasure;                             //Wątek odpowiedzialny za zliczanie czasu
+    private String userName;
 
     GameWindow()
     {
-        initializeHVComponents();
+
         //zmienne uzywane przy centrowaniu ramki
         int screenWidth = Toolkit.getDefaultToolkit().getScreenSize().width;        //Pobranie szerokosci ekranu
         int screenHeight = Toolkit.getDefaultToolkit().getScreenSize().height;      //pobranie wysokosci ekrany
@@ -39,6 +39,63 @@ public class GameWindow extends JFrame
         int frameHeight = this.getSize().height;
         this.setLocation((screenWidth - frameWidth)/2, (screenHeight - frameHeight)/2);         //Centrowanie ramki
 
+        initializeHVComponents();
+        OptionsFromInnerPanel();
+        OptionsFromMenuPanel();
+        OptionsFromScorePanel();
+
+    }
+
+    public void loadGame()
+    {
+        if(HVLevel.endOfTheGame)
+        {
+            finishTheGame();
+            HVLevel.levelNumber =1;
+            wrongAnswerCounter = 0;
+        }
+
+        lowerPanel.valueList.clear();
+        lowerPanel.circleList.clear();
+
+        if(!HVLevel.endOfTheGame)
+        {
+            level.whichLevel();
+            upperPanel.lvlText="Poziom: "+HVLevel.levelNumber;
+            upperPanel.missText ="Liczba błędów: "+wrongAnswerCounter;
+            upperPanel.repaint();
+
+            while(lowerPanel.circleList.size() != level.howManyObjects )
+            {
+                lowerPanel.addValue();
+            }
+            HVLevel.levelNumber ++;
+        }
+    }
+    public void finishTheGame()
+    {
+        timeMeasure.interrupt();        //Przerwanie liczenia czasu
+        userName = JOptionPane.showInputDialog("Podaj mi proszę swoje imię...");
+        try
+        {
+            PrintWriter scoreSave = new PrintWriter(new FileWriter("score.txt", true));
+            LocalDateTime currentDate = LocalDateTime.now();
+            DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
+            String formattedDate = currentDate.format(dateFormat);
+            scoreSave.println(formattedDate + "/" + userName + "/" + upperPanel.timeText
+                    + "/" + wrongAnswerCounter);
+            scoreSave.close();
+            scorePanel.readScore();
+        }
+        catch (Exception e) { System.err.println(e.getMessage()); }
+        //System.out.println(userName + ", twoj czas to: " + upperPanel.timeText);
+        lowerPanel.repaint();           //Odswieżenie Panelu gry
+        upperPanel.click = false;
+    }
+
+    public void initializeHVComponents()
+    {
+
         innerGameScreen.setPreferredSize(new Dimension(1024, 768));
         innerGameScreen.setBackground(Color.DARK_GRAY);
         gameScreen.setLayout(cLayout);          //Ustawienie Card Layout'u na głównym panelu
@@ -52,7 +109,26 @@ public class GameWindow extends JFrame
         innerGameScreen.add(lowerPanel);                      //Dodanie Panelu gry
 
         cLayout.show(gameScreen,"1");                   //Wybranie wyświetlenia Panelu Menu
+    }
 
+    public void OptionsFromScorePanel()
+    {
+        scorePanel.addMouseListener(new MouseAdapter()
+        {
+            @Override
+            public void mousePressed(MouseEvent e)
+            {
+                super.mousePressed(e);
+                if(e.getY() > 658)
+                {
+                    cLayout.show(gameScreen,"1");
+                }
+            }
+        });
+    }
+
+    public void OptionsFromMenuPanel()
+    {
         menuPanel.addMouseListener(new MouseAdapter()
         {
             @Override
@@ -81,68 +157,9 @@ public class GameWindow extends JFrame
                 }
             }
         });
-        scorePanel.addMouseListener(new MouseAdapter()
-        {
-            @Override
-            public void mousePressed(MouseEvent e)
-            {
-                super.mousePressed(e);
-                if(e.getY() > 658)
-                {
-                    cLayout.show(gameScreen,"1");
-                }
-            }
-        });
     }
 
-    public void loadGame()
-    {
-        if(HVLevel.endOfTheGame)
-        {
-            finishTheGame();
-            HVLevel.levelNumber =1;
-            wrongAnswerCounter = 0;
-        }
-
-        lowerPanel.valueList.clear();
-        lowerPanel.circleList.clear();
-
-        if(!HVLevel.endOfTheGame)
-        {
-            level.whichLevel();
-            upperPanel.lvlText="Poziom: "+HVLevel.levelNumber;
-            upperPanel.missText ="Liczba błędów: "+wrongAnswerCounter;
-            upperPanel.repaint();
-
-            while(lowerPanel.circleList.size() != level.howManyObjects )
-            {
-                lowerPanel.AddValue();
-            }
-            HVLevel.levelNumber ++;
-        }
-    }
-    public void finishTheGame()
-    {
-        timeMeasure.interrupt();        //Przerwanie liczenia czasu
-        userName = JOptionPane.showInputDialog("Podaj mi proszę swoje imię...");
-        try
-        {
-            PrintWriter scoreSave = new PrintWriter(new FileWriter("score.txt", true));
-            LocalDateTime currentDate = LocalDateTime.now();
-            DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
-            String formattedDate = currentDate.format(dateFormat);
-            scoreSave.println(formattedDate + "/" + userName + "/" + upperPanel.timeText
-                    + "/" + wrongAnswerCounter);
-            scoreSave.close();
-            scorePanel.readScore();
-        }
-        catch (Exception e) { System.err.println(e.getMessage()); }
-        //System.out.println(userName + ", twoj czas to: " + upperPanel.timeText);
-        lowerPanel.repaint();           //Odswieżenie Panelu gry
-        upperPanel.click = false;
-    }
-
-    public void initializeHVComponents()
+    public void OptionsFromInnerPanel()
     {
         lowerPanel.addMouseListener(new MouseAdapter()
         {
@@ -192,19 +209,18 @@ public class GameWindow extends JFrame
                     HVLevel.endOfTheGame = false;
                     loadGame();
                     timeMeasure.start();
-
                     upperPanel.click = true;
                 }
+
                 if(e.getX() > 865)
                 {
                     cLayout.show(gameScreen,"1");
                     HVLevel.levelNumber =1;
                     wrongAnswerCounter = 0;
                     upperPanel.click = false;
+
                     if(timeMeasure != null)
-                    {
                         timeMeasure.interrupt();
-                    }
 
                     lowerPanel.valueList.clear();
                     lowerPanel.circleList.clear();
@@ -234,8 +250,6 @@ public class GameWindow extends JFrame
             }
         }).start();
     }
-
-
 
     class TimeMeasuring implements Runnable {
         int oneTenthMilliseconds, seconds, minutes;

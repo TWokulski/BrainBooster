@@ -20,7 +20,7 @@ public class PlayWindow extends JPanel
     }
 
 
-    public void AddValue()
+    public void addValue()
     {
         int scale = level.getRandomSize();
         int startX = level.getRandomX(scale);
@@ -80,7 +80,7 @@ public class PlayWindow extends JPanel
         {
             g.setFont(new Font("Arial",Font.BOLD, ((Number)valueList.get(j)).fontSize));
             g.drawString(
-                    (((Number)valueList.get(j)).Value + ""),
+                    (((Number)valueList.get(j)).value + ""),
                     ((Number)valueList.get(j)).x,
                     ((Number)valueList.get(j)).y);
         }
@@ -116,10 +116,8 @@ public class PlayWindow extends JPanel
     {
         for(int i = 0; i < valueList.size(); i++)
         {
-            if(((Number)valueList.get(whichObjectWasClicked)).Value < ((Number)valueList.get(i)).Value)
-            {
+            if(((Number)valueList.get(whichObjectWasClicked)).value < ((Number)valueList.get(i)).value)
                 return false;
-            }
         }
         return true;
     }

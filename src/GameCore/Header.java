@@ -3,6 +3,13 @@ package GameCore;
 import javax.swing.*;
 import java.awt.*;
 
+/**
+ *  Obiekt <code>Header</code> reprezentuje panel nagłówka, łączony z panelem <code>PlayWindow</code>.
+ *  W panelu informacje dotyczące rozgrywki: Czas gry, aktualny poziom, liczba popełnionych błędów
+ *  W panelu umieszczone zostały przyciski "START" i "BACK" pozwalające na rozpoczacie i przerwanie gry
+ *
+ * @author Tomasz Gruzdzis
+ */
 
 public class Header extends JPanel
 {
@@ -14,13 +21,9 @@ public class Header extends JPanel
     private Color textColor;
     private int startX;
     private int startY;
-
     public boolean click;
-    Header()
-    {
-        setPreferredSize(new Dimension(1024,72));
 
-    }
+    Header(){ setPreferredSize(new Dimension(1024,72)); }
 
     @Override
     public void paintComponent(Graphics g)
@@ -37,17 +40,19 @@ public class Header extends JPanel
         g.drawLine(690,10,690,60);
         g.drawLine(865,10,865,60);
         g.drawString("BACK",885,50);
-        if(!startText.equals("START")) {
+        if(!startText.equals("START"))
+        {
             textColor = Color.DARK_GRAY;
             g.setFont(new Font("Arial",Font.BOLD, 32));
             startX = 705;
             startY = 45;
         }
-        else {
+        else
+         {
             startX = 710;
             startY = 50;
             textColor = Color.BLACK;
-        }
+         }
         g.setColor(textColor);
         g.drawString(startText,startX,startY);
 
