@@ -1,15 +1,10 @@
 package GameCore;
 
-import javax.sound.sampled.AudioInputStream;
-import javax.sound.sampled.AudioSystem;
-import javax.sound.sampled.Clip;
+import javax.sound.sampled.*;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.PrintWriter;
+import java.awt.event.*;
+import java.io.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -23,7 +18,6 @@ public class GameWindow extends JFrame
     GameMenu menuPanel = new GameMenu();            //Panel menu głównego
     CardLayout cLayout = new CardLayout();          //Card Layout pozwala na szybkie przemieszczanie się pomiędzy panelami Menu i gry
     public static int wrongAnswerCounter = 0;       //Zmienna zliczająca błędne odpowiedzi
-    public static boolean hvChosen = false;
     HVLevel level = new HVLevel();                  //Reprezentacja poziomów, obiekt pozwala na uzyskiwanie różnicy w parametrach
     Thread timeMeasure;                             //Wątek odpowiedzialny za zliczanie czasu
     String userName;
@@ -69,7 +63,6 @@ public class GameWindow extends JFrame
                 {
                     if(e.getY() > 2*menuPanel.rectHeight && e.getY() < 3*menuPanel.rectHeight)
                     {
-                        GameWindow.hvChosen = true;
                         System.out.println("click");
                         cLayout.show(gameScreen,"2");
                         JOptionPane.showMessageDialog(null,
@@ -141,6 +134,7 @@ public class GameWindow extends JFrame
             scoreSave.println(formattedDate + "/" + userName + "/" + upperPanel.timeText
                     + "/" + wrongAnswerCounter);
             scoreSave.close();
+            scorePanel.readScore();
         }
         catch (Exception e) { System.err.println(e.getMessage()); }
         //System.out.println(userName + ", twoj czas to: " + upperPanel.timeText);
@@ -221,9 +215,7 @@ public class GameWindow extends JFrame
                     upperPanel.repaint();
                     lowerPanel.repaint();
 
-
                 }
-
             }
         });
     }
