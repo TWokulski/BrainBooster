@@ -8,25 +8,49 @@ import java.io.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
+/**
+ * Klasa glowna, reprezentujaca ramke programu.
+ * W klasie znajdziemy zainicjowane komponenty i obsluge myszki poszczegolnych paneli.
+ * W klasie wystepuje klasa wewnetrzna odpowiedzialna za odmierzanie czasu gry.
+ *
+ * @author Tomasz
+ */
+
 public class GameWindow extends JFrame
 {
-    private JPanel gameScreen = new JPanel();               //Panel gameScreen to panel główny, wykorzystywany do CardLayout
-    private JPanel innerGameScreen = new JPanel();          //Panel innerGameScreen służy jako panel zbiorczy dla nagłówka i okienka gry
-    private Header upperPanel = new Header();               //Panel nagłówka, mieści informacje o grze, oraz kontrolki podreczne
-    private PlayWindow lowerPanel = new PlayWindow();       //Panel gry, to na nim pojawiaja sie wartości przeznaczone do wybrania w HV
+    /** Panel gameScreen to panel glowny, wykorzystywany do CardLayout. */
+    private JPanel gameScreen = new JPanel();
+    /** Panel innerGameScreen sluzy jako panel zbiorczy dla naglowka i okna gry. */
+    private JPanel innerGameScreen = new JPanel();
+    /** Instancja naglowka - <code>Header</code>. */
+    private Header upperPanel = new Header();
+    /** Instancja panelu gry - <code>PlayWindow</code>. */
+    private PlayWindow lowerPanel = new PlayWindow();
+    /** Instancja panelu winikow - <code>ScoreBoard</code>. */
     private ScoreBoard scorePanel = new ScoreBoard();
-    private GameMenu menuPanel = new GameMenu();            //Panel menu głównego
-    private CardLayout cLayout = new CardLayout();          //Card Layout pozwala na szybkie przemieszczanie się pomiędzy panelami Menu i gry
-    private HVLevel level = new HVLevel();                  //Reprezentacja poziomów, obiekt pozwala na uzyskiwanie różnicy w parametrach
+    /** Instancja panelu menu glownego - <code>GameMenu</code>. */
+    private GameMenu menuPanel = new GameMenu();
+    /** Card Layout pozwala na szybkie przemieszczanie sie pomiedzy panelami Menu i gry*/
+    private CardLayout cLayout = new CardLayout();
+    /** Instancja klasy odpowiedzialnej za system poziomow - <code>HVLevel</code>. */
+    private HVLevel level = new HVLevel();
 
-    private static int wrongAnswerCounter = 0;       //Zmienna zliczająca błędne odpowiedzi
-    private Thread timeMeasure;                             //Wątek odpowiedzialny za zliczanie czasu
+    /** Zmienna zliczajaca bledne odpowiedzi. */
+    private static int wrongAnswerCounter = 0;
+    /** Watek odpowiedzialny za zliczanie czasu gry. */
+    private Thread timeMeasure;
+    /** Zmienna przechowujaca imie gracza - reprezentowane przy wynikach. */
     private String userName;
+
+    /**
+     * Konstruktor domyslny.
+     * Ustawia ramke.
+     * Dodaje komponenty.
+     */
 
     GameWindow()
     {
-
-        //zmienne uzywane przy centrowaniu ramki
+        /** Zmienne uzywane przy centrowaniu ramki. */
         int screenWidth = Toolkit.getDefaultToolkit().getScreenSize().width;        //Pobranie szerokosci ekranu
         int screenHeight = Toolkit.getDefaultToolkit().getScreenSize().height;      //pobranie wysokosci ekrany
 
@@ -40,61 +64,90 @@ public class GameWindow extends JFrame
         int frameHeight = this.getSize().height;
         this.setLocation((screenWidth - frameWidth)/2, (screenHeight - frameHeight)/2);         //Centrowanie ramki
 
-        initializeHVComponents();
-        OptionsFromInnerPanel();
-        OptionsFromMenuPanel();
-        OptionsFromScorePanel();
+        initializeHVComponents();   //Wywolanie metody inicjujacej komponenty
+        OptionsFromInnerPanel();   //Wywolanie metody wprowadzajacej obsluge myszki dla panelu gry
+        OptionsFromMenuPanel();   //Wywolanie metody wprowadzajacej obsluge myszki dla panelu menu
+        OptionsFromScorePanel();   //Wywolanie metody wprowadzajacej obsluge myszki dla panelu wynikow
 
     }
 
+    /**
+     * Metoda wczytujaca gre.
+     * Ustawia plansze, obsluguje informacje dotyczace gry.
+     */
+
     public void loadGame()
     {
+        /** Jezeli gra zostala zakonczona */
         if(HVLevel.endOfTheGame)
         {
+            /** Wywolanie metody zakonczenia i zapisu gry.*/
             finishTheGame();
+            /** Zerowanie poziomu i bledow. */
             HVLevel.levelNumber =1;
             wrongAnswerCounter = 0;
         }
 
+        /** Wyczyszcenie list przed wywolaniem obiektow.*/
         lowerPanel.valueList.clear();
         lowerPanel.circleList.clear();
 
+        /** Jezeli gra nie zostala zakonczona. */
         if(!HVLevel.endOfTheGame)
         {
+            /** Pobranie parametru poziomu */
             level.whichLevel();
+            /** Aktualizacja naglowka */
             upperPanel.lvlText="Poziom: "+HVLevel.levelNumber;
             upperPanel.missText ="Liczba błędów: "+wrongAnswerCounter;
             upperPanel.repaint();
 
+            /** Do momentu osiagniecia wymaganej liczby obeiktow na planszy wywoluje metode stworzenia obiektu. */
             while(lowerPanel.circleList.size() != level.howManyObjects )
             {
                 lowerPanel.addValue();
             }
+            /** Kolejny poziom */
             HVLevel.levelNumber ++;
         }
     }
+
+    /**
+     * Metoda konczaca gre.
+     * Odpowiada za zapis wynikow do pliku.
+     */
+
     public void finishTheGame()
     {
         timeMeasure.interrupt();        //Przerwanie liczenia czasu
+        /** Pobranie imienia uzytkownika */
         userName = JOptionPane.showInputDialog("Podaj mi proszę swoje imię...");
         if(userName.isEmpty() || userName.equals(""))
             userName = "Brak";
         try
         {
+            /** Otwarcie strumienia zapisujacego. */
             PrintWriter scoreSave = new PrintWriter(new FileWriter("score.txt", true));
+            /** Pobranie aktualnej daty i czasu do pozniejszego zidentyfikowania wynikow. */
             LocalDateTime currentDate = LocalDateTime.now();
             DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
+            /** Zapis do pliku z uzyciem separatora "/" */
             String formattedDate = currentDate.format(dateFormat);
             scoreSave.println(formattedDate + "/" + userName + "/" + upperPanel.timeText
                     + "/" + wrongAnswerCounter);
             scoreSave.close();
+            /** Zaktualizowanie tablicy wynikow. */
             scorePanel.readScore();
         }
         catch (Exception e) { System.err.println(e.getMessage()); }
-        //System.out.println(userName + ", twoj czas to: " + upperPanel.timeText);
         lowerPanel.repaint();           //Odswieżenie Panelu gry
         upperPanel.click = false;
     }
+
+    /**
+     * Metoda inicjujaca komponenty.
+     * Dodaje do ramki potrzebne panele i ustawia ktory ma byc widoczny po uruchomieniu.
+     */
 
     public void initializeHVComponents()
     {
@@ -114,10 +167,15 @@ public class GameWindow extends JFrame
         cLayout.show(gameScreen,"1");                   //Wybranie wyświetlenia Panelu Menu
     }
 
+    /**
+     * Metoda wprowadzajaca obsluge myszki dla panelu wynikow
+     */
+
     public void OptionsFromScorePanel()
     {
         scorePanel.addMouseListener(new MouseAdapter()
         {
+            /** Obsluga przycisku "Back" */
             @Override
             public void mousePressed(MouseEvent e)
             {
@@ -130,6 +188,10 @@ public class GameWindow extends JFrame
         });
     }
 
+    /**
+     * Metoda wprowadzajaca obsluge myszki dla panelu Menu
+     */
+
     public void OptionsFromMenuPanel()
     {
         menuPanel.addMouseListener(new MouseAdapter()
@@ -137,22 +199,23 @@ public class GameWindow extends JFrame
             @Override
             public void mousePressed(MouseEvent e)
             {
+                /** Obsluga przycisku uruchomienia gry */
                 super.mousePressed(e);
                 if(e.getX() > (menuPanel.distanceToRectX)/2 && e.getX() < (menuPanel.distanceToRectX)/2 + menuPanel.rectWidth)
                 {
                     if(e.getY() > 2*menuPanel.rectHeight && e.getY() < 3*menuPanel.rectHeight)
                     {
-                        System.out.println("click");
                         cLayout.show(gameScreen,"2");
                         JOptionPane.showMessageDialog(null,
                                 "Witaj w grze 'The High Value'! Celem gry jest w jak najkrótszym czasie bla bla bla bla...");
-
                     }
 
+                    /** Obsluga przycisku przejscia do panelu wynikow */
                     if(e.getY() > (int)(3.5*menuPanel.rectHeight) && e.getY() < (int)(4.5*menuPanel.rectHeight))
                     {
                         cLayout.show(gameScreen,"3");
                     }
+                    /** Obsluga przycisku wysjcia */
                     if(e.getY() > 5*menuPanel.rectHeight && e.getY() < 6*menuPanel.rectHeight)
                     {
                         System.exit(1);
@@ -162,16 +225,24 @@ public class GameWindow extends JFrame
         });
     }
 
+    /**
+     * Metoda wprowadzajaca obsluge myszki dla gry
+     */
     public void OptionsFromInnerPanel()
     {
+        /**
+         * Obsluga panelu <code>PlayWindow</code>
+         */
         lowerPanel.addMouseListener(new MouseAdapter()
         {
             @Override
             public void mousePressed(MouseEvent e) {
+                /** Obsluga klikniecia w wartosc na planszy */
                 super.mousePressed(e);
-                if(lowerPanel.isInValueArea(e) == true)
+                if(lowerPanel.isInValueArea(e))
                 {
-                    if(lowerPanel.checkValue()==true)
+                    /** Jezeli nie ma wiekszej wartosci */
+                    if(lowerPanel.checkValue())
                     {
                         if(HVLevel.levelNumber > 10)
                         {
@@ -182,6 +253,7 @@ public class GameWindow extends JFrame
                         playSound(new File("goodSound.wav"));
                         loadGame();
                     }
+                    /** Jezeli jest wieksza wartosci */
                     else
                     {
                         wrongAnswerCounter++;
@@ -197,12 +269,16 @@ public class GameWindow extends JFrame
             }
         });
 
+        /**
+         * Obsluga panelu <code>Header</code>
+         */
         upperPanel.addMouseListener(new MouseAdapter()
         {
             @Override
             public void mousePressed(MouseEvent e)
             {
                 super.mousePressed(e);
+                /** Obsluga przycisku "START" */
                 if(e.getX() > 690 && e.getX() < 865 && !upperPanel.click)
                 {
                     upperPanel.startText = "START";
@@ -210,10 +286,11 @@ public class GameWindow extends JFrame
                     timeMeasure = new Thread(new TimeMeasuring());
                     HVLevel.endOfTheGame = false;
                     loadGame();
-                    timeMeasure.start();
+                    timeMeasure.start();    //Rozpoczecie mierzenia czasu
                     upperPanel.click = true;
                 }
 
+                /** Obsluga przycisku "BACk" */
                 if(e.getX() > 865)
                 {
                     cLayout.show(gameScreen,"1");
@@ -224,6 +301,7 @@ public class GameWindow extends JFrame
                     if(timeMeasure != null)
                         timeMeasure.interrupt();
 
+                    /** Wyczyszczenie planszy */
                     lowerPanel.valueList.clear();
                     lowerPanel.circleList.clear();
                     upperPanel.lvlText = "Poziom: ";
@@ -237,6 +315,11 @@ public class GameWindow extends JFrame
             }
         });
     }
+
+    /**
+     * Metoda obslugujaca dzwieki dobrego i zlego wyboru wartosci.
+     * @param soundFile przekazuje jaki dzwiek ma zostac odtworzony
+     */
 
     public static synchronized void playSound(final File soundFile) {
         new Thread(new Runnable() {
@@ -253,12 +336,19 @@ public class GameWindow extends JFrame
         }).start();
     }
 
+    /**
+     * Klasa wewnetrzna obslugujaca odmierzanie czasu gry
+     */
+
     class TimeMeasuring implements Runnable {
+        /** Zmienne przechowujace jednostki czasu */
         int oneTenthMilliseconds, seconds, minutes;
+        /** Zmienne pomocnicze uzupelniane zerami jezeli zmienna przechowujaca jednostke czasu jest jedno cyforwa */
         String millisecondsText, secondsText, minutesText;
         public void run()
         {
             minutes = 0; seconds = 0; oneTenthMilliseconds = 0;
+            /** Do momentu kiedy czas nie zostanie przerwany lub kiedy maksymalny czas gry zostanie przekroczony. */
             while (minutes < 61 || !Thread.currentThread().isInterrupted())
             {
                 try

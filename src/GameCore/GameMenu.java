@@ -3,20 +3,37 @@ package GameCore;
 import javax.swing.*;
 import java.awt.*;
 
+/**
+ *  Obiekt <code>GameMenu</code> reprezentuje panel menu, pierwszy widoczny element gry.
+ *  Na panel skladaja sie 3 przyciski: uruchomieniowy gry, przycisk wynikow, oraz przycisk opuszczenia gry.
+ *
+ * @author Tomasz Gruzdzis
+ */
 
 public class GameMenu extends JPanel
 {
+    /** Zmienna przechowujaca obrazek tla. */
     private static Image bgMenu = new ImageIcon("bgMenu.gif").getImage();
+    /** Zmienna przechowujaca dlugosc przycisku. */
     public final int rectWidth = 384;
+    /** Zmienna przechowujaca szerokosc przycisku. */
     public final int rectHeight = 96;
+    /** Zmienna pomocnicza do ustawienia przyciskow na panelu. */
     public final int distanceToRectX = (1024-rectWidth);
 
-
+    /**
+     * Konstruktor domyslny.
+     * Ustawia rozmiar panelu.
+     */
     GameMenu()
     {
         setPreferredSize(new Dimension(1024, 768));
     }
 
+    /**
+     * Metoda rysujaca panel.
+     * Ustawia obraz tla i przyciski.
+     */
     @Override
     public void paintComponent(Graphics g)
     {
