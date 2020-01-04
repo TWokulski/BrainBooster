@@ -8,7 +8,7 @@ import java.io.FileReader;
 import java.io.IOException;
 
 /**
- *  Obiekt <code>ScoreBoard</code> reprezentuje panel z tablicą wyników.
+ *  Obiekt <code>ScoreBoard</code> reprezentuje panel z tablica wynikow.
  *  W panelu znajdziemy tablice z wynikami odczytanymi z pliku tekstowego oraz przycisk powrotu do Menu
  *
  * @author Tomasz Gruzdzis
@@ -16,49 +16,56 @@ import java.io.IOException;
 
 public class ScoreBoard extends JPanel
 {
-    /** Zmienna przechowująca obrazek tła */
+    /** Zmienna przechowujaca obrazek tla */
     private static Image bgMenu = new ImageIcon("bgMenu.gif").getImage();
-    /** Deklaracja Tabeli, przeznaczonej do prezentowania wyników */
+    /** Deklaracja Tabeli, przeznaczonej do prezentowania wynikow */
     private JTable scoreTable;
-    /** Zadeklarowanie kolum jakie będą używane w tabeli */
+    /** Zadeklarowanie kolum jakie beda uzywane w tabeli */
     private String[] columnNames = {"Date", "Player Name", "Time", "Wrong answers"};
+
+    /**
+     * Konstruktor domyslny.
+     */
 
     ScoreBoard()
     {
         this.setLayout( new FlowLayout() );
         /**
-         * Stworzenie obiektu tabeli, nie posiadającej kolumn i wiersz.
-         * Kolumny i wiersze dodane zostają w readScore()
+         * Stworzenie obiektu tabeli, nie posiadajacej kolumn i wierszy.
+         * Kolumny i wiersze dodane zostaja w readScore()
          * @see GameCore.ScoreBoard#readScore()
          */
         scoreTable = new JTable(0,0);
         readScore();
-        /** Ustawienie maksymalnych wymiarów tabeli, a także koloru tła i czcionki */
+        /** Ustawienie maksymalnych wymiarow tabeli, a takze koloru tla i czcionki */
         scoreTable.setPreferredScrollableViewportSize(new Dimension(800,300));
         scoreTable.setFillsViewportHeight(true);
         scoreTable.setBackground(Color.BLACK);
         scoreTable.setFont(new Font("Arial",Font.PLAIN, 20));
         scoreTable.setForeground(Color.WHITE);
         /** Wprowadzenie domyslnego sortowania
-         * pozwala miedzy innymi na zmiane trybu prezentowania wyników względem daty
+         * pozwala miedzy innymi na zmiane trybu prezentowania wynikow wzgledem daty
          */
         scoreTable.setAutoCreateRowSorter(true);
-        /** Zablokowanie możliwości edytowania z punktu programu */
+        /** Zablokowanie mozliwosci edytowania z punktu programu */
         scoreTable.setEnabled(false);
 
-        /** Deklaracja scrollPane, wprowadza suwak, który umozliwia gromadzenie wiekszej ilości danych w tabeli  */
+        /** Deklaracja scrollPane, wprowadza suwak, ktory umozliwia gromadzenie wiekszej ilosci danych w tabeli  */
         JScrollPane scrollPane = new JScrollPane(scoreTable);
         add(scrollPane);
     }
 
+    /**
+     * Metoda odczytujaca dane z pliku i zapisujaca je do tabeli
+     */
+
     public void readScore()
     {
-        /** Metoda odczytująca dane z pliku i zapisująca je do tabeli */
         try
         {
-            /** Otwarcie strumienia odczytującego i wybranie pliku z wynikami
+            /** Otwarcie strumienia odczytujacego i wybranie pliku z wynikami
              * @see GameWindow#finishTheGame()
-             * */
+             */
             BufferedReader scoreRead = new BufferedReader (new FileReader("score.txt"));
 
             DefaultTableModel model = (DefaultTableModel)scoreTable.getModel();
@@ -69,31 +76,31 @@ public class ScoreBoard extends JPanel
 
             if(scoreTable.getRowCount() != 0)
             {
-                /** Jeżeli tablica nie jest pusta, dodany do tablicy zostanie tylko ostatni wiersz w pliku tekstowym
+                /** Jezeli tablica nie jest pusta, dodany do tablicy zostanie tylko ostatni wiersz w pliku tekstowym
                  *  @see GameWindow#finishTheGame()
                  */
                 String line = tableLines[tableLines.length - 1].toString().trim();
-                /** Podział pobranej lini względem znaku "/" */
+                /** Podzial pobranej lini wzgledem znaku "/" */
                 String[] dataRow = line.split("/");
                 /** Dodanie wiersza do tabeli */
                 model.addRow(dataRow);
             }
             else
             {
-                /** Jeżeli tablica jest pusta, dodany do tablicy zostaną wszystkie wiersze w pliku tekstowym
+                /** Jezeli tablica jest pusta, dodany do tablicy zostana wszystkie wiersze w pliku tekstowym
                  *  @see ScoreBoard#ScoreBoard()
                  */
                 for(int i = 0; i < tableLines.length; i++)
                 {
-                    /** Do <code>line</code> zostaną przypisane kolejne wiersze w pliku tekstowym
-                     * Po każdym wieszu nastepuje dodanie do tabeli
+                    /** Do <code>line</code> zostana przypisane kolejne wiersze w pliku tekstowym
+                     * Po kazdym wieszu nastepuje dodanie do tabeli
                      */
                     String line = tableLines[i].toString().trim();
                     String[] dataRow = line.split("/");
                     model.addRow(dataRow);
                 }
             }
-            /** Zamknięcie strumienia*/
+            /** Zamkniecie strumienia*/
             scoreRead.close();
         }
         catch (IOException e)
@@ -102,9 +109,12 @@ public class ScoreBoard extends JPanel
         }
     }
 
+    /**
+     * Metoda rysujaca obraz tla, oraz przycisk powrotu u dolu panelu
+     */
+
     @Override
     public void paintComponent(Graphics g) {
-        /** Metoda rysująca obraz tła, oraz przycisk powrotu u dołu panelu */
         super.paintComponent(g);
         g.drawImage(bgMenu, 0, 0, 1024, 768, null);
         g.setFont(new Font("Arial",Font.BOLD, 60));

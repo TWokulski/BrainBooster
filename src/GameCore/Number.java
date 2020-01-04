@@ -1,40 +1,43 @@
 package GameCore;
 
 /**
- *  Obiekt <code>Number</code> reprezentuje liczbę pojawiającą się na panelu Play window
- *  współrzędnę obiektu odpowiadają wspołrzędnym obiektu typu <code>CircleValue</code>
- *  Rozmiar obiektu jest uzależniony od rozmiary obiektu typu <code>CircleValue</code>
- *  Obiekty zapisywane są w ArrayList
+ *  Obiekt <code>Number</code> reprezentuje liczbe pojawiajacą sie na panelu Play window
+ *  wspolrzedne obiektu odpowiadaja wspolrzednym obiektu typu <code>CircleValue</code>
+ *  Rozmiar obiektu jest uzalezniony od rozmiaru obiektu typu <code>CircleValue</code>
+ *  Obiekty zapisywane sa w ArrayList
+ *  Indeksy obiektow <code>CircleValue</code> odpowiadaja obiektom <code>Number</code>
  * @see PlayWindow#valueList
  * @see PlayWindow#addValue()
- * Indeksy obiektów <code>CircleValue</code> odpowiadają obiektom <code>Number</code>
  *
  * @author Tomasz Gruzdzis
  */
 
 public class Number
 {
-    /** Zmienna przechowująca wartość liczby */
+    /** Zmienna przechowujaca wartosc liczby */
     public int value;
-    /** Zmienna przechowująca rozmiar liczby */
+    /** Zmienna przechowujaca rozmiar liczby */
     public int fontSize;
-    /** Zmienna przechowująca współrzędną X liczby */
+    /** Zmienna przechowujaca wspolrzedna X liczby */
     public int x;
-    /** Zmienna przechowująca współrzędną Y liczby */
+    /** Zmienna przechowujaca wspolrzedna Y liczby */
     public int y;
+
+
+    /**
+     * Konstruktor domyslny.
+     * @param w ustawia wspolrzedna x
+     * @param h ustawia wspolrzedna y
+     * @param s ustawia rozmiar fontSize
+     * @param randomValue wartosc liczby
+     */
 
     Number(int w, int h, int s, int randomValue)
     {
-        /**
-         * @param w ustawia współrzędną x
-         * @param h ustawia współrzędną y
-         * @param s ustawia rozmiar fontSize
-         * @param randomValue wartośc liczby
-         */
         value = randomValue;
 
-        /** Wprowadzone wspołcztnniki służą umieszczeniu wartości wewnątrz okregu
-         *  Różny parametr dla wartości wiekszych/mniejszych od "10" służy wyśrodkowaniu liczby w okregu
+        /** Wprowadzone wspolczynniki sluza umieszczeniu wartosci wewnatrz okregu
+         *  Rozny parametr dla wartosci wiekszych/mniejszych od "10" sluzy wysrodkowaniu liczby w okregu
          */
         if(value <10)
             x = (int)(w+0.33*s);
@@ -43,6 +46,17 @@ public class Number
             x = (int)(w+0.22*s);
 
         fontSize = (int)(0.5*s);
+
+        y = (int)(h+0.7*s);
+    }
+
+    public void changeNumberPosition(int w, int h, int s)
+    {
+        if(value <10)
+            x = (int)(w+0.33*s);
+
+        else
+            x = (int)(w+0.22*s);
 
         y = (int)(h+0.7*s);
     }

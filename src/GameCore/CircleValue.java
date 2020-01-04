@@ -4,39 +4,74 @@ import javax.swing.*;
 import java.awt.*;
 
 /**
- *  Obiekt <code>CircleValue</code> reprezentuje okręg pojawiający sie na panelu Play window
- *  Służy on zwiekszeniu grywalności, poprzez wskazanie obszaru przeznaczonego do kliknięcia
- *  Obiekty zapisywane są w ArrayList
+ *  Obiekt <code>CircleValue</code> reprezentuje okrag pojawiajacy sie na panelu Play window
+ *  Sluzy on zwiekszeniu grywalnosci, poprzez wskazanie obszaru przeznaczonego do klikniecia
+ *  Obiekty zapisywane sa w ArrayList
+ *  Indeksy obiektow <code>CircleValue</code> odpowiadaja obiektom <code>Number</code>
  * @see PlayWindow#circleList
  * @see PlayWindow#addValue()
- * Indeksy obiektów <code>CircleValue</code> odpowiadają obiektom <code>Number</code>
  *
  * @author Tomasz Gruzdzis
  */
 
 public class CircleValue
 {
-    /** Zmienna przechowująca obrazek tła */
+    /** Zmienna przechowujaca obrazek tla */
     private static Image circle = new ImageIcon("circle2.gif").getImage();
-    /** Zmienna przechowująca rozmiar okręgu */
+    /** Zmienna przechowujaca rozmiar okregu */
     public int size;
-    /** Zmienna przechowująca współrzędną X okręgu */
+    /** Zmienna przechowujaca wspolrzedna X okregu */
     public int x;
-    /** Zmienna przechowująca współrzędną Y okręgu */
+    /** Zmienna przechowujaca wspolrzedna Y okregu */
     public int y;
+
+
+    private int dx = 1;
+    private int dy = 1;
+
+    /**
+     * Konstruktor domyslny.
+     * @param w ustawia wspolrzedna x
+     * @param h ustawia wspolrzedna y
+     * @param s ustawia rozmiar size
+     */
 
     CircleValue(int w, int h, int s)
     {
-        /**
-         * @param w ustawia współrzędną x
-         * @param h ustawia współrzędną y
-         * @param s ustawia rozmiar size
-         */
         x = w;
         y = h;
         size = s;
     }
-    /** Metoda zwracająca obraz okręgu
+    public void changeCirclePosition()
+    {
+        Rectangle PanelBorders = new Rectangle(1024,696);
+        x += dx;
+        y += dy;
+
+        if (y + size >= PanelBorders.getMaxY())
+        {
+            y = (int)(PanelBorders.getMaxY()-size);
+            dy = -dy;
+        }
+        if (x + size >= PanelBorders.getMaxX())
+        {
+            x = (int)(PanelBorders.getMaxX()-size);
+            dx = -dx;
+        }
+        if (y < PanelBorders.getMinY())
+        {
+            y = (int)PanelBorders.getMinY();
+            dy = -dy;
+        }
+
+        if (x < PanelBorders.getMinX())
+        {
+            x = (int)PanelBorders.getMinX();
+            dx = -dx;
+        }
+    }
+
+    /** Metoda zwracajaca obraz okregu
      * @see PlayWindow#paintComponent(Graphics)
      */
     public static Image getImg()

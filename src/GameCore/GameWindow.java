@@ -18,6 +18,7 @@ public class GameWindow extends JFrame
     private GameMenu menuPanel = new GameMenu();            //Panel menu głównego
     private CardLayout cLayout = new CardLayout();          //Card Layout pozwala na szybkie przemieszczanie się pomiędzy panelami Menu i gry
     private HVLevel level = new HVLevel();                  //Reprezentacja poziomów, obiekt pozwala na uzyskiwanie różnicy w parametrach
+
     private static int wrongAnswerCounter = 0;       //Zmienna zliczająca błędne odpowiedzi
     private Thread timeMeasure;                             //Wątek odpowiedzialny za zliczanie czasu
     private String userName;
@@ -76,6 +77,8 @@ public class GameWindow extends JFrame
     {
         timeMeasure.interrupt();        //Przerwanie liczenia czasu
         userName = JOptionPane.showInputDialog("Podaj mi proszę swoje imię...");
+        if(userName.isEmpty() || userName.equals(""))
+            userName = "Brak";
         try
         {
             PrintWriter scoreSave = new PrintWriter(new FileWriter("score.txt", true));
@@ -189,7 +192,6 @@ public class GameWindow extends JFrame
                             upperPanel.missText ="Liczba błędów: "+wrongAnswerCounter;
 
                         upperPanel.repaint();
-                        System.out.println("no nie");
                     }
                 }
             }
