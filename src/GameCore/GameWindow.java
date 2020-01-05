@@ -13,7 +13,7 @@ import java.time.format.DateTimeFormatter;
  * W klasie znajdziemy zainicjowane komponenty i obsluge myszki poszczegolnych paneli.
  * W klasie wystepuje klasa wewnetrzna odpowiedzialna za odmierzanie czasu gry.
  *
- * @author Tomasz
+ * @author Tomasz Gruzdzis
  */
 
 public class GameWindow extends JFrame
@@ -78,6 +78,10 @@ public class GameWindow extends JFrame
 
     public void loadGame()
     {
+        /** Wyczyszcenie list przed wywolaniem obiektow.*/
+        lowerPanel.valueList.clear();
+        lowerPanel.circleList.clear();
+
         /** Jezeli gra zostala zakonczona */
         if(HVLevel.endOfTheGame)
         {
@@ -88,9 +92,6 @@ public class GameWindow extends JFrame
             wrongAnswerCounter = 0;
         }
 
-        /** Wyczyszcenie list przed wywolaniem obiektow.*/
-        lowerPanel.valueList.clear();
-        lowerPanel.circleList.clear();
 
         /** Jezeli gra nie zostala zakonczona. */
         if(!HVLevel.endOfTheGame)
@@ -107,6 +108,10 @@ public class GameWindow extends JFrame
             {
                 lowerPanel.addValue();
             }
+            if(level.isObject1Moving)
+                lowerPanel.startAnimation(0);
+            if(level.isObject2Moving)
+                lowerPanel.startAnimation(1);
             /** Kolejny poziom */
             HVLevel.levelNumber ++;
         }
@@ -199,15 +204,16 @@ public class GameWindow extends JFrame
             @Override
             public void mousePressed(MouseEvent e)
             {
-                /** Obsluga przycisku uruchomienia gry */
+
                 super.mousePressed(e);
                 if(e.getX() > (menuPanel.distanceToRectX)/2 && e.getX() < (menuPanel.distanceToRectX)/2 + menuPanel.rectWidth)
                 {
+                    /** Obsluga przycisku uruchomienia gry */
                     if(e.getY() > 2*menuPanel.rectHeight && e.getY() < 3*menuPanel.rectHeight)
                     {
                         cLayout.show(gameScreen,"2");
-                        JOptionPane.showMessageDialog(null,
-                                "Witaj w grze 'The High Value'! Celem gry jest w jak najkrótszym czasie bla bla bla bla...");
+                        HVLevel.endOfTheGame = false;
+                        lowerPanel.instructionShow = true;
                     }
 
                     /** Obsluga przycisku przejscia do panelu wynikow */
@@ -281,6 +287,7 @@ public class GameWindow extends JFrame
                 /** Obsluga przycisku "START" */
                 if(e.getX() > 690 && e.getX() < 865 && !upperPanel.click)
                 {
+                    lowerPanel.instructionShow = false;
                     upperPanel.startText = "START";
                     upperPanel.repaint();
                     timeMeasure = new Thread(new TimeMeasuring());
@@ -290,30 +297,38 @@ public class GameWindow extends JFrame
                     upperPanel.click = true;
                 }
 
-                /** Obsluga przycisku "BACk" */
+                /** Obsluga przycisku "BACK" */
                 if(e.getX() > 865)
                 {
                     cLayout.show(gameScreen,"1");
-                    HVLevel.levelNumber =1;
-                    wrongAnswerCounter = 0;
-                    upperPanel.click = false;
-
-                    if(timeMeasure != null)
-                        timeMeasure.interrupt();
-
-                    /** Wyczyszczenie planszy */
-                    lowerPanel.valueList.clear();
-                    lowerPanel.circleList.clear();
-                    upperPanel.lvlText = "Poziom: ";
-                    upperPanel.timeText = "00:00:00 ";
-                    upperPanel.missText = "Liczba błędów: ";
-                    upperPanel.startText = "START";
-                    upperPanel.repaint();
-                    lowerPanel.repaint();
-
+                    breakTheGame();     //Wywolanie metody czyszczacej plansze.
                 }
             }
         });
+    }
+
+    /**
+     * Metoda przerywajaca gre.
+     * Uzywana w przypadku uzycia przycisku "BACK", oraz przekroczenia 60 min gry.
+     */
+    private void breakTheGame()
+    {
+        HVLevel.levelNumber =1;
+        wrongAnswerCounter = 0;
+        upperPanel.click = false;
+
+        if(timeMeasure != null)
+            timeMeasure.interrupt();
+
+        /** Wyczyszczenie planszy */
+        lowerPanel.valueList.clear();
+        lowerPanel.circleList.clear();
+        upperPanel.lvlText = "Poziom: ";
+        upperPanel.timeText = "00:00:00 ";
+        upperPanel.missText = "Liczba błędów: ";
+        upperPanel.startText = "START";
+        upperPanel.repaint();
+        lowerPanel.repaint();
     }
 
     /**
@@ -367,10 +382,9 @@ public class GameWindow extends JFrame
                         seconds = 0;
                         minutes++;
                     }
-                    if (minutes == 60)
-                    {
-                        System.out.println("You probably forgot about the game!");
-                    }
+
+                    if (minutes == 60)      //przekroczenie czasu gry.
+                        breakTheGame();
 
                     if(oneTenthMilliseconds < 10)
                         millisecondsText = "0" + oneTenthMilliseconds;
