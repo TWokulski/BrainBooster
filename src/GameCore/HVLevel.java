@@ -5,6 +5,7 @@ import java.util.Random;
 /**
  * Obiekt <code>HVLevel</code> sluzy przedstawieniu systemu poziomow rozgrywki.
  * Obiekt decyduje o wymiarach parametrow gry, takich jak ilosc obiektow na planszy czy roznice pojawiajacych sie wartosci.
+ *
  * @author Tomasz Gruzdzis
  */
 
@@ -19,6 +20,10 @@ public class HVLevel
     private int valueLimit;
     /** Flaga informujaca o zakonczeniu rozgrywki. */
     public static boolean endOfTheGame;
+    /** Flaga informujaca poruszajacym sie obiekcie 1. */
+    public boolean isObject1Moving;
+    /** Flaga informujaca poruszajacym sie obiekcie 2. */
+    public boolean isObject2Moving;
 
     Random random = new Random();
 
@@ -32,6 +37,8 @@ public class HVLevel
        {
            case 1:
                endOfTheGame = false;
+               isObject1Moving = false;
+               isObject2Moving = false;
                howManyObjects = 6;
                valueLimit = 14;
                break;
@@ -58,14 +65,16 @@ public class HVLevel
            case 7:
                howManyObjects = 9;
                valueLimit = 30;
+               isObject1Moving = true;
                break;
            case 8:
                howManyObjects = 10;
                valueLimit = 34;
                break;
            case 9:
-               howManyObjects = 10;
+               howManyObjects = 9;
                valueLimit = 40;
+               isObject2Moving = true;
                break;
            case 10:
                howManyObjects = 10;

@@ -26,10 +26,14 @@ public class PlayWindow extends JPanel
     private int whichObjectWasClicked;
     /** Zmienna przechowujaca obrazek tla */
     private static Image bg2 = new ImageIcon("gb2.gif").getImage();
+    private static Image instr = new ImageIcon("Instr.png").getImage();
     /** Reprezentacja klasy <code>HVLevel</code> informujaca o zmieniajacych sie parametrach wraz z poziomami */
     HVLevel level = new HVLevel();
     /** Deklarcja watku odpowiedzialnego za poruszanie sie wartosci */
-    Thread movingAnimation;
+    private Thread movingAnimation;
+    private ThreadGroup animationGroup = new ThreadGroup("Moving Circles");
+    /** Flaga informujaca o wlaczeniu instrukcji. */
+    public boolean instructionShow;
 
     /**
      * Konstruktor domyslny
@@ -93,48 +97,74 @@ public class PlayWindow extends JPanel
                 circleList.add(new CircleValue(startX, startY, scale));
                 valueList.add(new Number(startX, startY, scale, randomValue));
             }
-            startAnimation();
+
         }
         /** Odswiezenie panelu*/
         this.repaint();
     }
 
-    public synchronized void startAnimation()
+    /**
+     * Metoda odpowiedzialna za wywolanie animacji ruchu
+     * @param index ustawia ktory obiekt ma sie poruszac.
+     */
+
+    public synchronized void startAnimation(int index)
     {
-        movingAnimation = new Thread(new MoveTheCircle(((CircleValue) circleList.get(0)), ((Number) valueList.get(0)) ));
+        movingAnimation = new Thread(animationGroup,
+                new MoveTheCircle(((CircleValue) circleList.get(index)), ((Number) valueList.get(index)) ));
         movingAnimation.start();
     }
 
+    /**
+     * Klasa wewnetrzna wykorzystywana do przedstawienia ruchu.
+     */
     class MoveTheCircle implements Runnable {
 
+        /** Przeslany obiekt kola poprzez numer indeksu */
         CircleValue circle;
+        /** Przeslany obiekt wartosci poprzez numer indeksu */
         Number value;
+
+        /** Konstruktor domyslny
+         * @param circle ustawia wybrane kolo
+         * @param value ustawia wybrana wartosc
+         */
         MoveTheCircle(CircleValue circle, Number value)
         {
             this.circle = circle;
             this.value = value;
         }
+
+        /** Metoda wywolujaca zmiane pozycji */
         public void run()
         {
             try
             {
-                for(;;)
+                while(!Thread.currentThread().isInterrupted())
                 {
+                    if(HVLevel.endOfTheGame)
+                        Thread.currentThread().interrupt();
+
                     circle.changeCirclePosition();
 
-                    value.changeNumberPosition(circle.x,circle.y,circle.size);
+                    value.changeNumberPosition(circle.x,circle.y,circle.size);  //Wewnetrzna wartosc przyjmuje takie same parametry jak kolo
+
                     repaint();
-                    Thread.sleep(300);
+                    //Zmiana predkosci w zaleznosci od rozmiaru w celu latwiejszego wybrania pola wartosci
+                    if(circle.size < 150)
+                        Thread.sleep(100);
+                    else
+                        Thread.sleep(50);
                 }
             }
             catch (InterruptedException e) { }
         }
     }
 
+
     /**
      * Metoda sprawdzajaca lokalicacje, na ktorą wskazal uzytkownik.
      */
-
 
     public boolean isInValueArea(MouseEvent cursor)
     {
@@ -190,6 +220,11 @@ public class PlayWindow extends JPanel
         super.paintComponent(g);
         /** Ustawienie obrazu tla. */
         g.drawImage(bg2,0,0,1024,696,null);
+
+        if(instructionShow)
+        {
+            g.drawImage(instr,0,0,1024,696,null);
+        }
 
         /** Petla odpowiedzialna za narysowanie wszystkich obiektow z <code>circleList</code> */
         for (int i = 0; i < circleList.size(); i++)

@@ -1,9 +1,46 @@
 package GameCore;
 
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
+import javax.sound.sampled.FloatControl;
+import java.io.File;
+
+/**
+ *  Klasa z metoda main.
+ *  Rola uruchomieniowa.
+ *
+ * @author Tomasz Gruzdzis
+ */
+
 public class BB_Main
 {
     public static void main(String[] args)
     {
         new GameWindow().setVisible(true);
+        playMusic();
+    }
+    /**
+     *  Metoda odpowiedzialna za muzyke w tle.
+     */
+
+    public static synchronized void playMusic()
+    {
+        new Thread(new Runnable() {
+            public void run() {
+                try {
+                    Clip music = AudioSystem.getClip();
+                    AudioInputStream inputStream = AudioSystem.getAudioInputStream(new File("music1.wav"));
+                    music.open(inputStream);
+                    music.loop(100);
+                    FloatControl gainControl =
+                            (FloatControl) music.getControl(FloatControl.Type.MASTER_GAIN);
+                    gainControl.setValue(-25.0f);
+                    music.start();
+                } catch (Exception e) {
+                    System.err.println(e.getMessage());
+                }
+            }
+        }).start();
     }
 }

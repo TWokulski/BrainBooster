@@ -125,7 +125,7 @@ public class GameWindow extends JFrame
     public void finishTheGame()
     {
         timeMeasure.interrupt();        //Przerwanie liczenia czasu
-        /** Pobranie imienia uzytkownika */
+        /** Pobranie imienia uzytkownika. */
         userName = JOptionPane.showInputDialog("Podaj mi proszę swoje imię...");
         if(userName.isEmpty() || userName.equals(""))
             userName = "Brak";

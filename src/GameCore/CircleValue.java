@@ -2,6 +2,7 @@ package GameCore;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.Random;
 
 /**
  *  Obiekt <code>CircleValue</code> reprezentuje okrag pojawiajacy sie na panelu Play window
@@ -25,8 +26,9 @@ public class CircleValue
     /** Zmienna przechowujaca wspolrzedna Y okregu */
     public int y;
 
-
+    /** Zmienna przechowujaca zmiane wspolrzednej X okregu */
     private int dx = 1;
+    /** Zmienna przechowujaca zmiane wspolrzednej Y okregu */
     private int dy = 1;
 
     /**
@@ -42,6 +44,10 @@ public class CircleValue
         y = h;
         size = s;
     }
+
+    /**
+     * Metoda opisujaca ruch obiektu i ograniczajaca go do granic panelu
+     */
     public void changeCirclePosition()
     {
         Rectangle PanelBorders = new Rectangle(1024,696);
