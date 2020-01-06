@@ -30,7 +30,8 @@ public class BB_Main
             public void run() {
                 try {
                     Clip music = AudioSystem.getClip();
-                    AudioInputStream inputStream = AudioSystem.getAudioInputStream(new File("music1.wav"));
+                    AudioInputStream inputStream = AudioSystem.getAudioInputStream(
+                            new File(this.getClass().getResource("/Resources/music1.wav").getPath()));
                     music.open(inputStream);
                     music.loop(100);
                     FloatControl gainControl =

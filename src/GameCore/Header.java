@@ -14,7 +14,7 @@ import java.awt.*;
 public class Header extends JPanel
 {
     /** Zmienna przechowujaca obrazek tla */
-    private static Image bg = new ImageIcon("bg.gif").getImage();
+    private Image bg = new ImageIcon(getClass().getResource("/Resources/bg.gif")).getImage();
     /** Zmienna prezentujaca ilosc popelnioych bledow */
     String missText = "Liczba błędów: ";
     /** Zmienna prezentujaca poziom aktualnej planszy */

@@ -25,8 +25,8 @@ public class PlayWindow extends JPanel
     /** Zmienna przechowujaca informacje o indeksie wybranego obiektu */
     private int whichObjectWasClicked;
     /** Zmienna przechowujaca obrazek tla */
-    private static Image bg2 = new ImageIcon("gb2.gif").getImage();
-    private static Image instr = new ImageIcon("Instr.png").getImage();
+    private Image bg2 = new ImageIcon(getClass().getResource("/Resources/gb2.gif")).getImage();
+    private Image instr = new ImageIcon(getClass().getResource("/Resources/Instr.png")).getImage();
     /** Reprezentacja klasy <code>HVLevel</code> informujaca o zmieniajacych sie parametrach wraz z poziomami */
     HVLevel level = new HVLevel();
     /** Deklarcja watku odpowiedzialnego za poruszanie sie wartosci */

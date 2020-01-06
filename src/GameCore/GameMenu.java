@@ -13,7 +13,7 @@ import java.awt.*;
 public class GameMenu extends JPanel
 {
     /** Zmienna przechowujaca obrazek tla. */
-    private static Image bgMenu = new ImageIcon("bgMenu.gif").getImage();
+    private Image bgMenu = new ImageIcon(getClass().getResource("/Resources/bgMenu.gif")).getImage();
     /** Zmienna przechowujaca dlugosc przycisku. */
     public final int rectWidth = 384;
     /** Zmienna przechowujaca szerokosc przycisku. */

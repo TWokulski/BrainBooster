@@ -4,8 +4,8 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 
 /**
  *  Obiekt <code>ScoreBoard</code> reprezentuje panel z tablica wynikow.
@@ -17,7 +17,7 @@ import java.io.IOException;
 public class ScoreBoard extends JPanel
 {
     /** Zmienna przechowujaca obrazek tla */
-    private static Image bgMenu = new ImageIcon("bgMenu.gif").getImage();
+    private Image bgMenu = new ImageIcon(getClass().getResource("/Resources/bgMenu.gif")).getImage();
     /** Deklaracja Tabeli, przeznaczonej do prezentowania wynikow */
     private JTable scoreTable;
     /** Zadeklarowanie kolum jakie beda uzywane w tabeli */
@@ -66,7 +66,8 @@ public class ScoreBoard extends JPanel
             /** Otwarcie strumienia odczytujacego i wybranie pliku z wynikami
              * @see GameWindow#finishTheGame()
              */
-            BufferedReader scoreRead = new BufferedReader (new FileReader("score.txt"));
+            BufferedReader scoreRead = new BufferedReader (
+                    new InputStreamReader(getClass().getResourceAsStream("/Resources/score.txt")));
 
             DefaultTableModel model = (DefaultTableModel)scoreTable.getModel();
             /** Zapisanie lini do tablicy */

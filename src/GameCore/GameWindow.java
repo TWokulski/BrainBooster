@@ -132,7 +132,8 @@ public class GameWindow extends JFrame
         try
         {
             /** Otwarcie strumienia zapisujacego. */
-            PrintWriter scoreSave = new PrintWriter(new FileWriter("score.txt", true));
+            PrintWriter scoreSave = new PrintWriter(new FileWriter(
+                    this.getClass().getResource("/Resources/score.txt").getPath(), true));
             /** Pobranie aktualnej daty i czasu do pozniejszego zidentyfikowania wynikow. */
             LocalDateTime currentDate = LocalDateTime.now();
             DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
@@ -256,14 +257,14 @@ public class GameWindow extends JFrame
                             upperPanel.startText = "RESTART";
                             upperPanel.repaint();
                         }
-                        playSound(new File("goodSound.wav"));
+                        playSound(new File(this.getClass().getResource("/Resources/goodSound.wav").getPath()));
                         loadGame();
                     }
                     /** Jezeli jest wieksza wartosci */
                     else
                     {
                         wrongAnswerCounter++;
-                        playSound(new File("badSound.wav"));
+                        playSound(new File(this.getClass().getResource("/Resources/badSound.wav").getPath()));
                         if(wrongAnswerCounter > 100)
                             upperPanel.missText ="Liczba błędów: 100+";
                         else

@@ -2,7 +2,7 @@ package GameCore;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.Random;
+
 
 /**
  *  Obiekt <code>CircleValue</code> reprezentuje okrag pojawiajacy sie na panelu Play window
@@ -17,8 +17,9 @@ import java.util.Random;
 
 public class CircleValue
 {
+
     /** Zmienna przechowujaca obrazek tla */
-    private static Image circle = new ImageIcon("circle2.gif").getImage();
+    private static Image circle = new ImageIcon(CircleValue.class.getResource("/Resources/circle2.gif")).getImage();
     /** Zmienna przechowujaca rozmiar okregu */
     public int size;
     /** Zmienna przechowujaca wspolrzedna X okregu */
