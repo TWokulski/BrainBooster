@@ -5,6 +5,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
+import java.net.URL;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -41,6 +42,8 @@ public class GameWindow extends JFrame
     private Thread timeMeasure;
     /** Zmienna przechowujaca imie gracza - reprezentowane przy wynikach. */
     private String userName;
+    URL soundFile;
+
 
     /**
      * Konstruktor domyslny.
@@ -133,7 +136,7 @@ public class GameWindow extends JFrame
         {
             /** Otwarcie strumienia zapisujacego. */
             PrintWriter scoreSave = new PrintWriter(new FileWriter(
-                    this.getClass().getResource("/Resources/score.txt").getPath(), true));
+                    "score.txt", true));
             /** Pobranie aktualnej daty i czasu do pozniejszego zidentyfikowania wynikow. */
             LocalDateTime currentDate = LocalDateTime.now();
             DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
@@ -257,14 +260,16 @@ public class GameWindow extends JFrame
                             upperPanel.startText = "RESTART";
                             upperPanel.repaint();
                         }
-                        playSound(new File(this.getClass().getResource("/Resources/goodSound.wav").getPath()));
+                        soundFile = getClass().getResource("/Resources/goodSound.wav");
+                        playSound(soundFile);
                         loadGame();
                     }
                     /** Jezeli jest wieksza wartosci */
                     else
                     {
                         wrongAnswerCounter++;
-                        playSound(new File(this.getClass().getResource("/Resources/badSound.wav").getPath()));
+                        soundFile = getClass().getResource("/Resources/badSound.wav");
+                        playSound(soundFile);
                         if(wrongAnswerCounter > 100)
                             upperPanel.missText ="Liczba błędów: 100+";
                         else
@@ -337,7 +342,7 @@ public class GameWindow extends JFrame
      * @param soundFile przekazuje jaki dzwiek ma zostac odtworzony
      */
 
-    public static synchronized void playSound(final File soundFile) {
+    public static synchronized void playSound(final URL soundFile) {
         new Thread(new Runnable() {
             public void run() {
                 try {

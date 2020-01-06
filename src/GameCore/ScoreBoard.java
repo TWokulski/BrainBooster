@@ -4,6 +4,7 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
@@ -66,8 +67,7 @@ public class ScoreBoard extends JPanel
             /** Otwarcie strumienia odczytujacego i wybranie pliku z wynikami
              * @see GameWindow#finishTheGame()
              */
-            BufferedReader scoreRead = new BufferedReader (
-                    new InputStreamReader(getClass().getResourceAsStream("/Resources/score.txt")));
+            BufferedReader scoreRead = new BufferedReader (new FileReader("score.txt"));
 
             DefaultTableModel model = (DefaultTableModel)scoreTable.getModel();
             /** Zapisanie lini do tablicy */
