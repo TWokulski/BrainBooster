@@ -39,7 +39,7 @@ public class BB_Main
                     music.loop(100);
                     FloatControl gainControl =
                             (FloatControl) music.getControl(FloatControl.Type.MASTER_GAIN);
-                    gainControl.setValue(-25.0f);
+                    gainControl.setValue(-30.0f);
                     music.start();
                 } catch (Exception e) {
                     System.err.println(e.getMessage());
